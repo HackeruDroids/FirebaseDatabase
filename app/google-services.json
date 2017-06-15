@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "387420507188",
+    "firebase_url": "https://fir-databaseeve.firebaseio.com",
+    "project_id": "fir-databaseeve",
+    "storage_bucket": "fir-databaseeve.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:387420507188:android:db436c8cdc54d3e1",
+        "android_client_info": {
+          "package_name": "more.hackeru.edu.firebasedatabase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "387420507188-6p5mk66qangeqvffss6p7rmo08jjtgim.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "more.hackeru.edu.firebasedatabase",
+            "certificate_hash": "6bf2d8f37aacd5b59bb94afe7d3a2c2be4c0e8bb"
+          }
+        },
+        {
+          "client_id": "387420507188-cfq644vtgg610uijb568m85tlmjiaus5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeC0VzvmGWhZBqVUaKtucfIczg0oVzSdE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "387420507188-cfq644vtgg610uijb568m85tlmjiaus5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
