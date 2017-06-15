@@ -52,11 +52,18 @@ public class MainActivity extends AppCompatActivity {
 
         //user = FirebaseAuth.getInstance().getCurrentUser
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
+        //TODO: add listener...
         if (user == null) {
 
             List<AuthUI.IdpConfig> providers = new ArrayList<>();//google, email, phone, facebook
 
+            AuthUI.IdpConfig email = new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build();
+            AuthUI.IdpConfig google = new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build();
+           // AuthUI.IdpConfig phone = new AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build();
+
+            providers.add(email);
+            providers.add(google);
+           // providers.add(phone);
 
 
             Intent intent = AuthUI.getInstance().createSignInIntentBuilder().
@@ -64,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                     setProviders(providers).
                     build();
 
-
+            startActivity(intent);
             //Intent intent = new Intent();///
             //startActivity(intent);
         }
@@ -111,8 +118,12 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                return true;
+            case R.id.action_sign_out:
+
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
