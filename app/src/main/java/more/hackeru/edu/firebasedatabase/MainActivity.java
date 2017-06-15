@@ -2,6 +2,7 @@ package more.hackeru.edu.firebasedatabase;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -19,14 +20,70 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.common.Scopes;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    FirebaseAuth.AuthStateListener mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+        @Override
+        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+            //user = FirebaseAuth.getInstance().getCurrentUser
+            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+            if (user == null) {
+
+                List<AuthUI.IdpConfig> providers = new ArrayList<>();//google, email, phone, facebook
+
+                AuthUI.IdpConfig email = new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build();
+
+                AuthUI.IdpConfig google = new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).
+                        setPermissions(Arrays.asList(Scopes.PROFILE, Scopes.EMAIL)).build();
+
+                // AuthUI.IdpConfig phone = new AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build();
+
+                providers.add(email);
+                providers.add(google);
+                // providers.add(phone);
+
+
+                Intent intent = AuthUI.getInstance().createSignInIntentBuilder().
+                        setLogo(R.drawable.logo).
+                        setProviders(providers).
+                        build();
+
+                startActivity(intent);
+            } else if (!user.isEmailVerified()) {
+                //1)goto Monkey:
+
+                // 1.1) in monkey:
+                //      send email (onClick)
+                //      replace text with done!
+                //      onClick again ->
+                       /*
+                        user.reload().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                //test again
+                                if(user.isEmailVerified()){
+                                    //Go Main
+                                }else {
+                                    //..
+                                }
+                            }
+                        });
+                        */
+
+
+            }
+        }
+    };
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -42,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,36 +107,6 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        //user = FirebaseAuth.getInstance().getCurrentUser
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        //TODO: add listener...
-        if (user == null) {
-
-            List<AuthUI.IdpConfig> providers = new ArrayList<>();//google, email, phone, facebook
-
-            AuthUI.IdpConfig email = new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build();
-            AuthUI.IdpConfig google = new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build();
-           // AuthUI.IdpConfig phone = new AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build();
-
-            providers.add(email);
-            providers.add(google);
-           // providers.add(phone);
-
-
-            Intent intent = AuthUI.getInstance().createSignInIntentBuilder().
-                    setLogo(R.drawable.logo).
-                    setProviders(providers).
-                    build();
-
-            startActivity(intent);
-            //Intent intent = new Intent();///
-            //startActivity(intent);
-        }
-        //go Login =->
-        //Intent intent = new Intent(...)
-        //startActivity(intent);...
-
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -99,9 +127,19 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        FirebaseAuth.getInstance().addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        FirebaseAuth.getInstance().removeAuthStateListener(mAuthStateListener);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -122,7 +160,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
                 return true;
             case R.id.action_sign_out:
+                AuthUI.getInstance().signOut(this);
 
+                //intent...!
                 return true;
         }
 
