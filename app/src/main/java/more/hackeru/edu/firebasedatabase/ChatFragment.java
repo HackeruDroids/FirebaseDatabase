@@ -10,11 +10,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -50,25 +56,46 @@ public class ChatFragment extends Fragment {
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance();
 
+        readFromDB();
         return view;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
+    private void readFromDB(){
+        //Non Relational Database MongoDb
+        //1) get a reference to table (Case Sensitive!)
+        DatabaseReference chatRef = mDatabase.getReference("ChatItems");
+        final ArrayList<ChatItem> items = new ArrayList<>();
 
+        //2) add a listener for the data.
+
+        //Once -> get all the table.
+        //each change-> Update all the data
+        chatRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot queryResult) {
+                //iter
+                for (DataSnapshot row : queryResult.getChildren()) {
+                    ChatItem item = row.getValue(ChatItem.class);
+                    items.add(item);
+                    Toast.makeText(getContext(), item.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            //No Internet Connection
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(getContext(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     @OnClick(R.id.btnSend)
     public void onSendClicked() {
         String uid = mUser.getUid();
         //May be null
         Uri photoUrl = mUser.getPhotoUrl();
-
         String img = null;
-        if (photoUrl != null) {
+        if (photoUrl != null)
             img = photoUrl.toString();
-        }
         //get the message from the EditText.
         String message = etMessage.getText().toString();
         //Custom Object.
@@ -77,5 +104,12 @@ public class ChatFragment extends Fragment {
         mDatabase.getReference("ChatItems").push().setValue(item);
         //empty the EditText:
         etMessage.setText(null);
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }
