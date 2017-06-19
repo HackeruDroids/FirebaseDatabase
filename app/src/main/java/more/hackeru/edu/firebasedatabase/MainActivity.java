@@ -17,10 +17,14 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.Scopes;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import more.hackeru.edu.firebasedatabase.models.ChatUser;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,49 +36,23 @@ public class MainActivity extends AppCompatActivity {
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
             if (user == null) {
-
                 List<AuthUI.IdpConfig> providers = new ArrayList<>();//google, email, phone, facebook
-
                 AuthUI.IdpConfig email = new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build();
-
                 AuthUI.IdpConfig google = new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).
                         setPermissions(Arrays.asList(Scopes.PROFILE, Scopes.EMAIL)).build();
-
-                // AuthUI.IdpConfig phone = new AuthUI.IdpConfig.Builder(AuthUI.PHONE_VERIFICATION_PROVIDER).build();
-
                 providers.add(email);
                 providers.add(google);
-                // providers.add(phone);
-
-
                 Intent intent = AuthUI.getInstance().createSignInIntentBuilder().
                         setLogo(R.drawable.logo).
                         setProviders(providers).
                         build();
-
                 startActivity(intent);
-            } else if (!user.isEmailVerified()) {
-                //1)goto Monkey:
-
-                // 1.1) in monkey:
-                //      send email (onClick)
-                //      replace text with done!
-                //      onClick again ->
-                       /*
-                        user.reload().addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                //test again
-                                if(user.isEmailVerified()){
-                                    //Go Main
-                                }else {
-                                    //..
-                                }
-                            }
-                        });
-                        */
-
-
+            }else {
+                ChatUser chatUser = new ChatUser(user);
+                //1) ref
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users").child(user.getUid());
+                //2) setValue
+                ref.setValue(chatUser);
             }
         }
     };
